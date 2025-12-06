@@ -47,8 +47,18 @@ def tasks():
         return jsonify({'message': 'Task created successfully!'}), 201
 
     if request.method == 'GET':
-        # We will implement the SELECT logic here next
-        return jsonify({'message': 'GET not yet implemented.'}), 200
+        # 1. Execute the SQL command
+        cursor = conn.execute("SELECT * FROM tasks")
+        
+        # 2. Fetch all results
+        tasks = cursor.fetchall() 
+        conn.close()
+
+        # 3. Convert the list of sqlite3.Row objects into a list of dictionaries.
+        task_list = [dict(task) for task in tasks] 
+        
+        # 4. Return the list as a JSON response
+        return jsonify(task_list), 200
     return 'Task API endpoint ready.', 200
     
 # 4. Run the application
