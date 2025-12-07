@@ -7,6 +7,7 @@ DATABASE = 'time_logger.db'
 
 # 1. Initialize the Flask application
 app = Flask(__name__)
+CORS(app) #This is crutial line 
 
 # Helper function to connect to the DB
 # The row_factory makes the results look like a dictionary (access columns by name)
