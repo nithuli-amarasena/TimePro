@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import sqlite3
 
 #Define database file name
@@ -25,3 +26,32 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
+=======
+# backend/db.py
+
+import sqlite3
+
+# Define the database file name
+DATABASE = 'time_logger.db'
+
+def create_database():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # Create the tasks table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY,
+            title TEXT NOT NULL,
+            start_time TEXT,
+            end_time TEXT
+        );
+    """)
+
+    conn.commit()
+    conn.close()
+    print(f"Database '{DATABASE}' and 'tasks' table ensured.")
+
+if __name__ == '__main__':
+    create_database()
+>>>>>>> Stashed changes
