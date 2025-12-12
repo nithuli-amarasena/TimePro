@@ -7,10 +7,14 @@ DATABASE = 'time_logger.db'
 
 # 1. Initialize the Flask application
 app = Flask(__name__)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
 CORS(app) #This is crutial line 
 >>>>>>> Stashed changes
+=======
+CORS(app) #This is crutial line 
+>>>>>>> 103201b5dd364f0904f9eccc1083abaa3c5cee94
 
 # Helper function to connect to the DB
 # The row_factory makes the results look like a dictionary (access columns by name)
