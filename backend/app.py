@@ -7,14 +7,7 @@ DATABASE = 'time_logger.db'
 
 # 1. Initialize the Flask application
 app = Flask(__name__)
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
 CORS(app) #This is crutial line 
->>>>>>> Stashed changes
-=======
-CORS(app) #This is crutial line 
->>>>>>> 103201b5dd364f0904f9eccc1083abaa3c5cee94
 
 # Helper function to connect to the DB
 # The row_factory makes the results look like a dictionary (access columns by name)
@@ -38,16 +31,13 @@ def tasks():
         task_data = request.get_json()
         
         # 2. Extract the data fields
-<<<<<<< Updated upstream
         task_name = task_data['task_name']
-=======
+
         title = task_data['title']
->>>>>>> Stashed changes
         start_time = task_data['start_time']
         end_time = task_data['end_time']
         
         # 3. Execute the correct SQL INSERT statement
-<<<<<<< Updated upstream
         sql_query = "INSERT INTO tasks (task_name, start_time, end_time) VALUES (?, ?, ?)"
         
         conn.execute(sql_query, (task_name, start_time, end_time))
@@ -55,7 +45,7 @@ def tasks():
         # Commit saves the changes to the database permanently
         conn.commit() 
         conn.close()
-=======
+
         sql_query = "INSERT INTO tasks (title, start_time, end_time) VALUES (?, ?, ?)"
         
         conn.execute(sql_query, (title, start_time, end_time))
@@ -63,7 +53,6 @@ def tasks():
         # Commit saves the changes to the database permanently
         conn.commit() 
         conn.close()    
->>>>>>> Stashed changes
 
         # 4. Return a success message
         return jsonify({'message': 'Task created successfully!'}), 201

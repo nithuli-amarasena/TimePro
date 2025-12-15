@@ -1,6 +1,4 @@
-<<<<<<< Updated upstream
 import sqlite3
-
 #Define database file name
 DATABASE = 'time_logger.db'
 
@@ -26,7 +24,6 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
-=======
 # backend/db.py
 
 import sqlite3
@@ -54,4 +51,4 @@ def create_database():
 
 if __name__ == '__main__':
     create_database()
->>>>>>> Stashed changes
+
