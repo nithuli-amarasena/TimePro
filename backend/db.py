@@ -11,7 +11,7 @@ def init_db():
     cursor.execute('''
         CREATE TABLE tasks (
             id INTEGER PRIMARY KEY,
-            task_name TEXT NOT NULL,
+            title TEXT NOT NULL,
             start_time TEXT NOT NULL,
             end_time TEXT,
             duration INTEGER
