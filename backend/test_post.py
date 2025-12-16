@@ -6,7 +6,7 @@ API_URL = "http://127.0.0.1:5000/api/tasks"
 
 # 1. Define the data we want to send (in JSON format)
 new_task_data = {
-    "task_name": "Learn Flask POST request",
+    "title": "Learn Flask POST request",
     "start_time": datetime.datetime.now().isoformat(), # Use current time for testing
     "end_time": (datetime.datetime.now() + datetime.timedelta(hours=1)).isoformat()
 }
