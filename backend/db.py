@@ -7,11 +7,13 @@ def init_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
+    cursor.execute('''DROP TABLE IF EXISTS tasks;''')
+
     # Create the 'tasks' table
     cursor.execute('''
         CREATE TABLE tasks (
             id INTEGER PRIMARY KEY,
-            task_name TEXT NOT NULL,
+            title TEXT NOT NULL,
             start_time TEXT NOT NULL,
             end_time TEXT,
             duration INTEGER
