@@ -42,15 +42,7 @@ def tasks():
         
         # Commit saves the changes to the database permanently
         conn.commit() 
-        conn.close()
-
-        sql_query = "INSERT INTO tasks (title, start_time, end_time) VALUES (?, ?, ?)"
-        
-        conn.execute(sql_query, (title, start_time, end_time))
-        
-        # Commit saves the changes to the database permanently
-        conn.commit() 
-        conn.close()    
+        conn.close()  
 
         # 4. Return a success message
         return jsonify({'message': 'Task created successfully!'}), 201
@@ -90,6 +82,41 @@ def delete_task(task_id):
     
     # 4. Return a success message
     return jsonify({'message': f'Task with ID {task_id} deleted successfully'}), 200
+
+@app.route('/api/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    conn = get_db_connection()
+    task_data = request.get_json()
+    
+    # Extract data from the incoming JSON body
+    title = task_data.get('title')
+    start_time = task_data.get('start_time')
+    end_time = task_data.get('end_time')
+    
+    if not all([title, start_time, end_time]):
+        conn.close()
+        return jsonify({'message': 'Missing required fields'}), 400
+
+    # SQL command to update a task by its ID
+    sql_query = """
+        UPDATE tasks SET 
+        title = ?, 
+        start_time = ?, 
+        end_time = ? 
+        WHERE id = ?
+    """
+    
+    # Execute the command (ID is the last value)
+    cursor = conn.execute(sql_query, (title, start_time, end_time, task_id))
+    
+    if cursor.rowcount == 0:
+        conn.close()
+        return jsonify({'message': f'Task with ID {task_id} not found'}), 404
+        
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': f'Task with ID {task_id} updated successfully'}), 200
     
 # 4. Run the application
 if __name__ == '__main__':
