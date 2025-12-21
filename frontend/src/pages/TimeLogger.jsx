@@ -1,22 +1,30 @@
-import React from 'react';
+import React, { useState} from 'react';
 import AddEntry from '../components/AddEntry';
+import RecentLogs from '../components/RecentLogs';
 
 export default function TimeLogger() {
-  const refreshList = () => {
-    // We will build the "Recent Logs" table here in the next step
-    console.log("Task saved! Refreshing...");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [editingTask, setEditingTask] = useState(null);
+
+  const handleRefresh = () => { 
+    setRefreshTrigger(prev => prev + 1); 
+    setEditingTask(null); 
   };
 
+  const handleEditClick = (task) => {
+    setEditingTask(task);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    };
+
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <header style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2rem', margin: 0 }}>Daily Logger</h1>
-        <p style={{ color: '#888' }}>Track your work hours and project progress</p>
+        <h1>Time Tracker</h1>
       </header>
 
-      <AddEntry onTaskAdded={refreshList} />
+      <AddEntry onTaskAdded={handleRefresh} taskToEdit={editingTask}/>
+      <RecentLogs refresh={refreshTrigger} onEdit={handleEditClick} />
 
-      {/* Future: We will put a Table or Charts below this */}
     </div>
   );
 }

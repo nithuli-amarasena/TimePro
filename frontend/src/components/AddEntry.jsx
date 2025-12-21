@@ -1,8 +1,7 @@
-// Updated AddEntry.jsx
 import React, { useState, useEffect } from 'react';
 import './AddEntry.css';
 
-const AddEntry = ({ onTaskAdded }) => {
+const AddEntry = ({ onTaskAdded, taskToEdit }) => {
   const [formData, setFormData] = useState({
     title: '',
     log_date: new Date().toISOString().split('T')[0],
@@ -10,7 +9,7 @@ const AddEntry = ({ onTaskAdded }) => {
     end_time: '',
     w_id: '',
     p_id: '',
-    status: 'Pending' // Default value
+    status: 'Pending' 
   });
 
   const [workTypes, setWorkTypes] = useState([]);
@@ -21,32 +20,58 @@ const AddEntry = ({ onTaskAdded }) => {
   }, []);
 
   useEffect(() => {
-    if (formData.w_id) {
-      fetch(`http://127.0.0.1:5000/api/projects?w_id=${formData.w_id}`)
-        .then(res => res.json())
-        .then(data => {
-          setProjects(data);
-          setFormData(prev => ({ ...prev, p_id: '' }));
-        });
+    if (taskToEdit) {
+      setFormData(taskToEdit);
     }
-  }, [formData.w_id]);
+  }, [taskToEdit]);
+
+  useEffect(() => {
+  if (formData.w_id) {
+    fetch(`http://127.0.0.1:5000/api/projects?w_id=${formData.w_id}`)
+      .then(res => res.json())
+      .then(data => {
+        setProjects(data);
+        // FIX: Only clear p_id if we are NOT in edit mode
+        if (!taskToEdit) {
+          setFormData(prev => ({ ...prev, p_id: '' }));
+        }
+      });
+    }
+  }, [formData.w_id, taskToEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://127.0.0.1:5000/api/tasks', {
-      method: 'POST',
+    const method = taskToEdit ? 'PUT' : 'POST';
+    const url = taskToEdit 
+      ? `http://127.0.0.1:5000/api/tasks/${taskToEdit.id}` 
+      : 'http://127.0.0.1:5000/api/tasks';
+
+    const response = await fetch(url, {
+      method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     });
+
     if (response.ok) {
-      onTaskAdded();
-      setFormData({ ...formData, title: '', start_time: '', end_time: '' });
+      onTaskAdded(); 
+      setFormData({ 
+        title: '', 
+        log_date: new Date().toISOString().split('T')[0], 
+        start_time: '', 
+        end_time: '', 
+        w_id: '', 
+        p_id: '', 
+        status: 'Pending' 
+      });
+    } else {
+      alert("Failed to save. Check terminal for errors.");
     }
   };
 
   return (
     <div className="add-entry-card">
-      <h3>Log New Activity</h3>
+      <h3>{taskToEdit ? '✏️ Edit Activity' : '➕ Log New Activity'}</h3>
+
       <form onSubmit={handleSubmit} className="entry-form">
         <div className="form-row">
           <div className="input-group">
@@ -70,7 +95,6 @@ const AddEntry = ({ onTaskAdded }) => {
           <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required placeholder="What are you doing?" />
         </div>
 
-        {/* Updated Row: Date, Status, Start, End */}
         <div className="form-row status-row">
           <div className="input-group">
             <label>Date</label>
@@ -94,7 +118,15 @@ const AddEntry = ({ onTaskAdded }) => {
           </div>
         </div>
 
-        <button type="submit" className="save-btn">Add to Log</button>
+        <button type="submit" className="save-btn">
+          {taskToEdit ? 'Save Changes' : 'Add to Log'}
+        </button>
+
+        {taskToEdit && (
+          <button type="button" onClick={() => onTaskAdded()} className="cancel-btn">
+            Cancel Edit
+          </button>
+        )}
       </form>
     </div>
   );

@@ -1,0 +1,119 @@
+.recent-logs-container {
+  margin-top: 1.5rem;
+}
+
+.logs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.logs-table th {
+  color: #888;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.logs-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #252525;
+  font-size: 0.9rem;
+}
+
+.task-title { font-weight: 500; }
+.work-type-tag { 
+  color: #3b82f6; 
+  background: rgba(59, 130, 246, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+/* Status Pills */
+.status-pill {
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-pill.pending { background: rgba(255, 171, 0, 0.1); color: #ffab00; }
+.status-pill.in-progress { background: rgba(0, 184, 217, 0.1); color: #00b8d9; }
+.status-pill.completed { background: rgba(54, 179, 126, 0.1); color: #36b37e; }
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff5630;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.delete-btn:hover { opacity: 1; }
+
+.actions-cell {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Edit Button Styling (Blue) */
+.edit-btn {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+.edit-btn:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Delete Button Styling (Red) */
+.delete-btn {
+  color: #ff5630;
+  background: rgba(255, 86, 48, 0.1);
+}
+.delete-btn:hover {
+  background: #ff5630;
+  color: white;
+}
+
+.text-center { text-align: center; }
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

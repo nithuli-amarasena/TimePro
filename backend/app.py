@@ -75,9 +75,6 @@ def tasks():
     """).fetchall()
     return jsonify([dict(r) for r in rows])
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
-
 @app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     conn = get_db_connection()
@@ -102,39 +99,50 @@ def delete_task(task_id):
 @app.route('/api/tasks/<int:task_id>', methods=['PUT'])
 def update_task(task_id):
     conn = get_db_connection()
-    task_data = request.get_json()
-    
-    # Extract data from the incoming JSON body
-    title = task_data.get('title')
-    start_time = task_data.get('start_time')
-    end_time = task_data.get('end_time')
-    
-    if not all([title, start_time, end_time]):
-        conn.close()
-        return jsonify({'message': 'Missing required fields'}), 400
+    data = request.get_json()
 
-    # SQL command to update a task by its ID
+    # Calculate duration in minutes
+    fmt = '%H:%M'
+    try:
+        tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
+        duration = int(tdelta.total_seconds() / 60)
+    except Exception as e:
+        return jsonify({'message': 'Invalid time format'}), 400
+
+    # Update ALL fields in the database
     sql_query = """
         UPDATE tasks SET 
         title = ?, 
+        log_date = ?,
         start_time = ?, 
-        end_time = ? 
+        end_time = ?,
+        duration_minutes = ?,
+        p_id = ?,
+        w_id = ?,
+        status = ?
         WHERE id = ?
     """
     
-    # Execute the command (ID is the last value)
-    cursor = conn.execute(sql_query, (title, start_time, end_time, task_id))
+    cursor = conn.execute(sql_query, (
+        data['title'], 
+        data['log_date'],
+        data['start_time'], 
+        data['end_time'], 
+        duration,
+        data['p_id'],
+        data['w_id'],
+        data['status'],
+        task_id
+    ))
     
-    if cursor.rowcount == 0:
-        conn.close()
-        return jsonify({'message': f'Task with ID {task_id} not found'}), 404
-        
     conn.commit()
     conn.close()
-    
-    return jsonify({'message': f'Task with ID {task_id} updated successfully'}), 200
+
+    if cursor.rowcount == 0:
+        return jsonify({'message': 'Task not found'}), 404
+    else:
+        return jsonify({'message': 'Task updated successfully'}), 200
     
 # 4. Run the application
 if __name__ == '__main__':
-    # debug=True automatically restarts the server when you save changes
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
