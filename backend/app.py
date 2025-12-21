@@ -1,66 +1,82 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
+from datetime import datetime
 
-# Define the database file path
+app = Flask(__name__)
+CORS(app)
 DATABASE = 'time_logger.db'
 
-# 1. Initialize the Flask application
-app = Flask(__name__)
-CORS(app) #This is crutial line 
-
-# Helper function to connect to the DB
-# The row_factory makes the results look like a dictionary (access columns by name)
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  
+    conn.row_factory = sqlite3.Row
     return conn
 
-# 2. Define a simple test route to ensure the server is running
-@app.route('/')
-def home():
-    return 'Time Logger Backend is Running!'
+# --- 1. WORK TYPE ENDPOINTS ---
+@app.route('/api/work-types', methods=['GET', 'POST'])
+def work_types():
+    conn = get_db_connection()
+    if request.method == 'POST':
+        name = request.json.get('name')
+        cur = conn.execute("INSERT INTO work_types (name) VALUES (?)", (name,))
+        new_w_id = cur.lastrowid
+        conn.commit()
+        return jsonify({'w_id': new_w_id, 'name': name}), 201
+    
+    rows = conn.execute("SELECT * FROM work_types").fetchall()
+    return jsonify([dict(r) for r in rows])
 
-# 3. Define the main API endpoint
+# --- 2. PROJECT ENDPOINTS (Filtered by Work Type) ---
+@app.route('/api/projects', methods=['GET', 'POST'])
+def projects():
+    conn = get_db_connection()
+    # If the frontend sends ?w_id=1, we only return projects for W01
+    w_id = request.args.get('w_id')
+    
+    if request.method == 'POST':
+        data = request.json
+        cur = conn.execute("INSERT INTO projects (name, w_id) VALUES (?, ?)", 
+                           (data['name'], data['w_id']))
+        new_p_id = cur.lastrowid
+        conn.commit()
+        return jsonify({'p_id': new_p_id, 'name': data['name'], 'w_id': data['w_id']}), 201
+
+    if w_id:
+        rows = conn.execute("SELECT * FROM projects WHERE w_id = ?", (w_id,)).fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM projects").fetchall()
+    return jsonify([dict(r) for r in rows])
+
+# --- 3. TASK ENDPOINTS ---
 @app.route('/api/tasks', methods=['GET', 'POST'])
 def tasks():
     conn = get_db_connection()
-    
     if request.method == 'POST':
-        # 1. Get the JSON data sent from the frontend
-        task_data = request.get_json()
-        
-        # 2. Extract the data fields
-        title = task_data['title']
-        start_time = task_data['start_time']
-        end_time = task_data['end_time']
-        
-        # 3. Execute the correct SQL INSERT statement
-        sql_query = "INSERT INTO tasks (title   , start_time, end_time) VALUES (?, ?, ?)"
-        
-        conn.execute(sql_query, (title, start_time, end_time))
-        
-        # Commit saves the changes to the database permanently
-        conn.commit() 
-        conn.close()  
+        data = request.json
+        # Calculate duration in minutes: (End - Start)
+        fmt = '%H:%M'
+        tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
+        duration = int(tdelta.total_seconds() / 60)
 
-        # 4. Return a success message
-        return jsonify({'message': 'Task created successfully!'}), 201
+        conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                     (data['title'], data['log_date'], data['start_time'], 
+                      data['end_time'], duration, data['p_id'], data['w_id']))
+        conn.commit()
+        return jsonify({'message': 'Task Logged'}), 201
 
-    if request.method == 'GET':
-        # 1. Execute the SQL command
-        cursor = conn.execute("SELECT * FROM tasks")
-        
-        # 2. Fetch all results
-        tasks = cursor.fetchall() 
-        conn.close()
+    # Get tasks with Project/WorkType names joined
+    rows = conn.execute("""
+        SELECT t.*, p.name as project_name, w.name as work_type_name 
+        FROM tasks t
+        JOIN projects p ON t.p_id = p.p_id
+        JOIN work_types w ON t.w_id = w.w_id
+        ORDER BY t.log_date DESC
+    """).fetchall()
+    return jsonify([dict(r) for r in rows])
 
-        # 3. Convert the list of sqlite3.Row objects into a list of dictionaries.
-        task_list = [dict(task) for task in tasks] 
-        
-        # 4. Return the list as a JSON response
-        return jsonify(task_list), 200
-    return 'Task API endpoint ready.', 200
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
 
 @app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
