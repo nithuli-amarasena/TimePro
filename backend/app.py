@@ -58,10 +58,10 @@ def tasks():
         tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
         duration = int(tdelta.total_seconds() / 60)
 
-        conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                      (data['title'], data['log_date'], data['start_time'], 
-                      data['end_time'], duration, data['p_id'], data['w_id']))
+                      data['end_time'], duration, data['p_id'], data['w_id'], data.get('status')))
         conn.commit()
         return jsonify({'message': 'Task Logged'}), 201
 
