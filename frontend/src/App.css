@@ -54,7 +54,6 @@ body {
 
 .nav-item:hover { color: white; background: #2a2a2a; }
 
-/* The color for the link when you are actually on that page */
 .nav-item.active { 
   color: var(--primary); 
   background: rgba(59, 130, 246, 0.1); 

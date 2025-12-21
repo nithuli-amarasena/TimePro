@@ -75,6 +75,49 @@ def tasks():
     """).fetchall()
     return jsonify([dict(r) for r in rows])
 
+@app.route('/api/summary/<date>', methods=['GET'])
+def get_daily_summary(date):
+    conn = get_db_connection()
+    query = """
+        SELECT t.title, t.duration_minutes, w.name as work_type, p.name as project
+        FROM tasks t
+        JOIN work_types w ON t.w_id = w.w_id
+        JOIN projects p ON t.p_id = p.p_id
+        WHERE t.log_date = ?
+    """
+    rows = conn.execute(query, (date,)).fetchall()
+    conn.close()
+
+    tasks = [dict(r) for r in rows]
+    
+    # Pie chart data structure
+    summary = {}
+    total_minutes = 0
+    
+    for task in tasks:
+        w_name = task['work_type']
+        p_name = task['project']
+        duration = task['duration_minutes']
+        total_minutes += duration
+        
+        if w_name not in summary:
+            summary[w_name] = {"total": 0, "projects": {}}
+        
+        if p_name not in summary[w_name]["projects"]:
+            summary[w_name]["projects"][p_name] = {"total": 0, "tasks": []}
+            
+        summary[w_name]["total"] += duration
+        summary[w_name]["projects"][p_name]["total"] += duration
+        summary[w_name]["projects"][p_name]["tasks"].append({
+            "title": task['title'],
+            "duration": duration
+        })
+
+    return jsonify({
+        "total_logged": total_minutes,
+        "breakdown": summary
+    })
+
 @app.route('/api/tasks/<int:task_id>', methods=['DELETE'])
 def delete_task(task_id):
     conn = get_db_connection()
@@ -145,4 +188,4 @@ def update_task(task_id):
     
 # 4. Run the application
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000)  

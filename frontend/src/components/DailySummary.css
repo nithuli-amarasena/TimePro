@@ -1,0 +1,129 @@
+.daily-summary-card {
+  margin-top: 3rem; 
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.title-group h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: var(--text-main);
+}
+
+.date-picker-container {
+  display: flex;
+  align-items: center;
+  background: #7ba8d4;
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.summary-date-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.85rem;
+  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.total-logged-badge {
+  background: #f5f3ff;
+  color: #6366f1;
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.summary-layout {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.fetching {
+  opacity: 0.6;
+}
+
+.summary-list-section {
+  flex: 1.2;
+}
+
+.summary-chart-section {
+  flex: 0.8;
+  min-width: 280px;
+}
+
+/* Hierarchy Lines */
+.work-type-block {
+  margin-bottom: 1.2rem;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.w-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.p-container {
+  margin: 0.5rem 0 0.5rem 1.5rem;
+  border-left: 2px solid #e2e8f0;
+}
+
+.p-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.t-container {
+  margin-left: 1.5rem;
+  border-left: 1px dashed #cbd5e1;
+}
+
+.task-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.empty-summary {
+  padding: 4rem;
+  text-align: center;
+  color: #94a3b8;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+}
+
+@media (max-width: 900px) {
+  .summary-layout {
+    flex-direction: column;
+  }
+}

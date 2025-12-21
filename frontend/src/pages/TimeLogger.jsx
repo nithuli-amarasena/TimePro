@@ -1,6 +1,7 @@
 import React, { useState} from 'react';
 import AddEntry from '../components/AddEntry';
 import RecentLogs from '../components/RecentLogs';
+import DailySummary from '../components/DailySummary';
 
 export default function TimeLogger() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -23,6 +24,7 @@ export default function TimeLogger() {
       </header>
 
       <AddEntry onTaskAdded={handleRefresh} taskToEdit={editingTask}/>
+      <DailySummary refresh={refreshTrigger} />
       <RecentLogs refresh={refreshTrigger} onEdit={handleEditClick} />
 
     </div>
