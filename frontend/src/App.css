@@ -1,42 +1,75 @@
-#root {
-  max-width: 1280px;
+/* Global Colors */
+:root {
+  --bg-dark: #121212;
+  --bg-card: #1e1e1e;
+  --primary: #3b82f6;
+  --text-main: #ffffff;
+  --text-dim: #a0a0a0;
+  --border: #333333;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Header & Navbar */
+.app-header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-content {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; }
+.blue-text { color: var(--primary); }
+
+.nav-links { display: flex; gap: 1.5rem; }
+
+.nav-item {
+  text-decoration: none;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: 0.2s;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.nav-item:hover { color: white; background: #2a2a2a; }
+
+/* The color for the link when you are actually on that page */
+.nav-item.active { 
+  color: var(--primary); 
+  background: rgba(59, 130, 246, 0.1); 
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
 }
 
+/* Utility Card style for later use */
 .card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
 }
