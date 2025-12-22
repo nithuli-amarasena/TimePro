@@ -28,7 +28,7 @@ function App() {
               
               <NavLink to="/logs" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
                 <List size={18} />
-                <span>History</span>
+                <span>All Logs</span>
               </NavLink>
               
               <NavLink to="/management" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>

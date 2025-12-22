@@ -30,7 +30,9 @@ def work_types():
     rows = conn.execute("SELECT * FROM work_types").fetchall()
     return jsonify([dict(r) for r in rows])
 
+# ==========================================
 # PROJECT ENDPOINTS
+# ==========================================
 @app.route('/api/projects', methods=['GET', 'POST'])
 def projects():
     conn = get_db_connection()
@@ -50,20 +52,29 @@ def projects():
         rows = conn.execute("SELECT * FROM projects").fetchall()
     return jsonify([dict(r) for r in rows])
 
-# TASK ENDPOINTS
+# TASK ENDPOINTS (GET & POST)
 @app.route('/api/tasks', methods=['GET', 'POST'])
 def tasks():
     conn = get_db_connection()
     if request.method == 'POST':
         data = request.json
+        # 1. Calculate Duration
         fmt = '%H:%M'
         tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
         duration = int(tdelta.total_seconds() / 60)
 
+        # 2. Map names correctly
+        title = data.get('title')
+        log_date = data.get('log_date')
+        start_time = data.get('start_time')
+        end_time = data.get('end_time')
+        p_id = data.get('project_id') or data.get('p_id') 
+        w_id = data.get('work_type_id') or data.get('w_id')
+        status = data.get('status', 'Pending')
+
         conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                     (data['title'], data['log_date'], data['start_time'], 
-                      data['end_time'], duration, data['p_id'], data['w_id'], data.get('status', 'Pending')))
+                     (title, log_date, start_time, end_time, duration, p_id, w_id, status))
         conn.commit()
         return jsonify({'message': 'Task Logged'}), 201
 
@@ -76,7 +87,36 @@ def tasks():
     """).fetchall()
     return jsonify([dict(r) for r in rows])
 
-# DAILY SUMMARY ENDPOINT
+# TASK ENDPOINTS (PUT & DELETE)
+@app.route('/api/tasks/<int:task_id>', methods=['PUT', 'DELETE'])
+def handle_task(task_id):
+    conn = get_db_connection()
+    
+    if request.method == 'DELETE':
+        cursor = conn.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+        conn.commit()
+        return jsonify({'message': 'Deleted'}), 200 if cursor.rowcount > 0 else 404
+
+    # PUT (Update) Logic
+    data = request.json
+    
+    # Calculate new duration
+    fmt = '%H:%M'
+    tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
+    duration = int(tdelta.total_seconds() / 60)
+    
+    # Map names correctly
+    p_id = data.get('project_id') or data.get('p_id')
+    w_id = data.get('work_type_id') or data.get('w_id')
+
+    conn.execute("""UPDATE tasks SET title=?, log_date=?, start_time=?, end_time=?, 
+                    duration_minutes=?, p_id=?, w_id=?, status=? WHERE id=?""",
+                 (data['title'], data['log_date'], data['start_time'], data['end_time'], 
+                  duration, p_id, w_id, data['status'], task_id))
+    conn.commit()
+    return jsonify({'message': 'Updated'}), 200
+
+# SUMMARY ENDPOINT
 @app.route('/api/summary/<date>', methods=['GET'])
 def get_summary(date):
     conn = get_db_connection()
@@ -94,11 +134,9 @@ def get_summary(date):
 
     for row in rows:
         duration = row['duration_minutes'] or 0
-        status = row['status']
+        total_logged += duration
         w_type = row['work_type_name']
         project = row['project_name']
-
-        total_logged += duration
 
         if w_type not in breakdown:
             breakdown[w_type] = {"projects": {}}
@@ -107,31 +145,10 @@ def get_summary(date):
 
         breakdown[w_type]["projects"][project]["tasks"].append({
             "duration": duration,
-            "status": status  
+            "status": row['status']
         })
 
     return jsonify({"total_logged": total_logged, "breakdown": breakdown})
-
-# TASK UPDATE/DELETE ENDPOINT
-@app.route('/api/tasks/<int:task_id>', methods=['PUT', 'DELETE'])
-def handle_task(task_id):
-    conn = get_db_connection()
-    if request.method == 'DELETE':
-        cursor = conn.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
-        conn.commit()
-        return jsonify({'message': 'Deleted'}), 200 if cursor.rowcount > 0 else 404
-
-    data = request.json
-    fmt = '%H:%M'
-    tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
-    duration = int(tdelta.total_seconds() / 60)
-    
-    conn.execute("""UPDATE tasks SET title=?, log_date=?, start_time=?, end_time=?, 
-                    duration_minutes=?, p_id=?, w_id=?, status=? WHERE id=?""",
-                 (data['title'], data['log_date'], data['start_time'], data['end_time'], 
-                  duration, data['p_id'], data['w_id'], data['status'], task_id))
-    conn.commit()
-    return jsonify({'message': 'Updated'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
