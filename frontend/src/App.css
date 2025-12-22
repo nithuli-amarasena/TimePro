@@ -1,32 +1,54 @@
-/* Global Colors */
 :root {
-  --bg-dark: #121212;
-  --bg-card: #1e1e1e;
-  --primary: #3b82f6;
-  --text-main: #ffffff;
-  --text-dim: #a0a0a0;
-  --border: #333333;
+  --bg-dark: #0f172a;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --primary-blue: #3b82f6;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --max-width: 1200px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
-  margin: 0;
   background-color: var(--bg-dark);
   color: var(--text-main);
-  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
 }
 
-/* Header & Navbar */
+/* --- 2. MAIN APP LAYOUT --- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
 .app-header {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 0.75rem 0;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .nav-content {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -34,41 +56,82 @@ body {
   padding: 0 2rem;
 }
 
-.logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; }
-.blue-text { color: var(--primary); }
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
 
-.nav-links { display: flex; gap: 1.5rem; }
+.blue-text { 
+  color: var(--primary-blue);
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
 
 .nav-item {
-  text-decoration: none;
-  color: var(--text-dim);
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--text-muted);
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  transition: 0.2s;
+  transition: all 0.2s;
 }
 
-.nav-item:hover { color: white; background: #2a2a2a; }
-
-.nav-item.active { 
-  color: var(--primary); 
-  background: rgba(59, 130, 246, 0.1); 
+.nav-item:hover {
+  background: var(--border-color);
+  color: white;
 }
 
-.main-content {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+.nav-item.active {
+  background: var(--primary-blue);
+  color: white;
 }
 
-/* Utility Card style for later use */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  width: 100%; 
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-main);
+}
+
+.dashboard-top-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* On Desktop: Form and Summary sit side-by-side */
+@media (min-width: 1024px) {
+  .dashboard-top-row {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; 
+    gap: 2rem;
+    align-items: start;
+  }
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
 }

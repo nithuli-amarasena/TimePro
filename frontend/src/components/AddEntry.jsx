@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './AddEntry.css';
 
-const AddEntry = ({ onTaskAdded, taskToEdit }) => {
+const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
   const [formData, setFormData] = useState({
     title: '',
     log_date: new Date().toISOString().split('T')[0],
@@ -16,7 +16,9 @@ const AddEntry = ({ onTaskAdded, taskToEdit }) => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/work-types').then(res => res.json()).then(data => setWorkTypes(data));
+    fetch('http://127.0.0.1:5000/api/work-types')
+      .then(res => res.json())
+      .then(data => setWorkTypes(data));
   }, []);
 
   useEffect(() => {
@@ -26,16 +28,15 @@ const AddEntry = ({ onTaskAdded, taskToEdit }) => {
   }, [taskToEdit]);
 
   useEffect(() => {
-  if (formData.w_id) {
-    fetch(`http://127.0.0.1:5000/api/projects?w_id=${formData.w_id}`)
-      .then(res => res.json())
-      .then(data => {
-        setProjects(data);
-        // FIX: Only clear p_id if we are NOT in edit mode
-        if (!taskToEdit) {
-          setFormData(prev => ({ ...prev, p_id: '' }));
-        }
-      });
+    if (formData.w_id) {
+      fetch(`http://127.0.0.1:5000/api/projects?w_id=${formData.w_id}`)
+        .then(res => res.json())
+        .then(data => {
+          setProjects(data);
+          if (!taskToEdit) {
+            setFormData(prev => ({ ...prev, p_id: '' }));
+          }
+        });
     }
   }, [formData.w_id, taskToEdit]);
 
@@ -69,21 +70,32 @@ const AddEntry = ({ onTaskAdded, taskToEdit }) => {
   };
 
   return (
-    <div className="add-entry-card">
-      <h3>{taskToEdit ? '✏️ Edit Activity' : '➕ Log New Activity'}</h3>
+    <div className="card">
+      <h3 className="card-title">
+        {taskToEdit ? '✏️ Edit Activity' : '🚀 Log New Activity'}
+      </h3>
 
       <form onSubmit={handleSubmit} className="entry-form">
         <div className="form-row">
           <div className="input-group">
             <label>Work Type</label>
-            <select value={formData.w_id} onChange={(e) => setFormData({...formData, w_id: e.target.value})} required>
+            <select 
+              value={formData.w_id} 
+              onChange={(e) => setFormData({...formData, w_id: e.target.value})} 
+              required
+            >
               <option value="">Select Type...</option>
               {workTypes.map(w => <option key={w.w_id} value={w.w_id}>{w.name}</option>)}
             </select>
           </div>
           <div className="input-group">
             <label>Project</label>
-            <select value={formData.p_id} onChange={(e) => setFormData({...formData, p_id: e.target.value})} required disabled={!formData.w_id}>
+            <select 
+              value={formData.p_id} 
+              onChange={(e) => setFormData({...formData, p_id: e.target.value})} 
+              required 
+              disabled={!formData.w_id}
+            >
               <option value="">Select Project...</option>
               {projects.map(p => <option key={p.p_id} value={p.p_id}>{p.name}</option>)}
             </select>
@@ -92,29 +104,52 @@ const AddEntry = ({ onTaskAdded, taskToEdit }) => {
 
         <div className="input-group">
           <label>Task Description</label>
-          <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required placeholder="What are you doing?" />
+          <input 
+            type="text" 
+            value={formData.title} 
+            onChange={(e) => setFormData({...formData, title: e.target.value})} 
+            required 
+            placeholder="What are you working on?" 
+          />
         </div>
 
         <div className="form-row status-row">
           <div className="input-group">
             <label>Date</label>
-            <input type="date" value={formData.log_date} onChange={(e) => setFormData({...formData, log_date: e.target.value})} />
+            <input 
+              type="date" 
+              value={formData.log_date} 
+              onChange={(e) => setFormData({...formData, log_date: e.target.value})} 
+            />
           </div>
           <div className="input-group">
             <label>Status</label>
-            <select value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})}>
+            <select 
+              value={formData.status} 
+              onChange={(e) => setFormData({...formData, status: e.target.value})}
+            >
               <option value="Pending">🕒 Pending</option>
-              <option value="In Progress">🚀 In Progress</option>
+              <option value="In Progress">⚡ In Progress</option>
               <option value="Completed">✅ Completed</option>
             </select>
           </div>
           <div className="input-group">
             <label>Start</label>
-            <input type="time" value={formData.start_time} onChange={(e) => setFormData({...formData, start_time: e.target.value})} required />
+            <input 
+              type="time" 
+              value={formData.start_time} 
+              onChange={(e) => setFormData({...formData, start_time: e.target.value})} 
+              required 
+            />
           </div>
           <div className="input-group">
             <label>End</label>
-            <input type="time" value={formData.end_time} onChange={(e) => setFormData({...formData, end_time: e.target.value})} required />
+            <input 
+              type="time" 
+              value={formData.end_time} 
+              onChange={(e) => setFormData({...formData, end_time: e.target.value})} 
+              required 
+            />
           </div>
         </div>
 
@@ -123,7 +158,7 @@ const AddEntry = ({ onTaskAdded, taskToEdit }) => {
         </button>
 
         {taskToEdit && (
-          <button type="button" onClick={() => onTaskAdded()} className="cancel-btn">
+          <button type="button" onClick={onCancel} className="cancel-btn">
             Cancel Edit
           </button>
         )}
