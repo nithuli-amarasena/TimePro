@@ -14,7 +14,7 @@ def init_db():
     cursor.execute('DROP TABLE IF EXISTS projects')
     cursor.execute('DROP TABLE IF EXISTS work_types')
 
-    # 2. Work Types (W01, W02...)
+    # 2. Work Types (Top level)
     cursor.execute('''
         CREATE TABLE work_types (
             w_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,8 +22,7 @@ def init_db():
         )
     ''')
 
-    # 3. Projects (P01, P02...) 
-    # Linked to a Work Type. A project cannot exist without a Work Type.
+    # 3. Projects (Linked to Work Type)
     cursor.execute('''
         CREATE TABLE projects (
             p_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,15 +32,15 @@ def init_db():
         )
     ''')
 
-    # 4. Tasks (T01, T02...)
-    # Linked to a Project. This ensures T01 belongs to P01 and ONLY P01.
+    # 4. Tasks (Linked to Project and Work Type)
+    # Changed: start_time and end_time are now optional (removed NOT NULL)
     cursor.execute('''
         CREATE TABLE tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             log_date TEXT NOT NULL,
-            start_time TEXT NOT NULL,
-            end_time TEXT NOT NULL,
+            start_time TEXT, 
+            end_time TEXT,
             duration_minutes INTEGER,
             status TEXT DEFAULT 'Pending',
             p_id INTEGER NOT NULL,
@@ -51,13 +50,17 @@ def init_db():
         )
     ''')
 
-    # Seed initial data based on your example
-    cursor.execute("INSERT INTO work_types (name) VALUES ('W01'), ('W02')")
-    cursor.execute("INSERT INTO projects (name, w_id) VALUES ('P01', 1), ('P02', 1), ('P03', 1)")
+    # Seed initial data
+    cursor.execute("INSERT INTO work_types (name) VALUES ('Development'), ('Meetings')")
+    
+    # Development Projects
+    cursor.execute("INSERT INTO projects (name, w_id) VALUES ('Project Alpha', 1), ('Project Beta', 1)")
+    # Meeting Projects
+    cursor.execute("INSERT INTO projects (name, w_id) VALUES ('Daily Standup', 2)")
     
     conn.commit()
     conn.close()
-    print("Database initialized with tables and seed data.")
+    print("🚀 Database initialized with Cascade Delete enabled.")
 
 if __name__ == '__main__':
     init_db()
