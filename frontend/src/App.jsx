@@ -5,7 +5,7 @@ import { Clock, List, Settings } from 'lucide-react';
 // We will create these files in Step 4
 import TimeLogger from './pages/TimeLogger';
 import AllLogs from './pages/AllLogs';
-import Management from './pages/Management';
+import Management from './pages/ProjectManagement';
 
 import './App.css';
 
