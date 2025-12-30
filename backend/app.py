@@ -9,15 +9,15 @@ DATABASE = 'time_logger.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
-    conn.execute("PRAGMA foreign_keys = ON;")
+    conn.execute("PRAGMA foreign_keys = ON;") # Ensures deleting a Work Type deletes its Projects/Tasks
     conn.row_factory = sqlite3.Row
     return conn
 
 @app.route('/')
 def home():
-    return jsonify({"status": "Backend is Running", "message": "Use /api/tasks to fetch data"})
+    return jsonify({"status": "Backend is Running", "message": "API endpoints are active"})
 
-# WORK TYPE ENDPOINTS (Added PUT/DELETE)
+# --- WORK TYPE ENDPOINTS ---
 @app.route('/api/work-types', methods=['GET', 'POST'])
 def work_types():
     conn = get_db_connection()
@@ -45,7 +45,7 @@ def handle_work_type(w_id):
         conn.commit()
         return jsonify({'message': 'Work Type Updated'}), 200
 
-# PROJECT ENDPOINTS (Added PUT/DELETE)
+# --- PROJECT ENDPOINTS ---
 @app.route('/api/projects', methods=['GET', 'POST'])
 def projects():
     conn = get_db_connection()
@@ -59,8 +59,13 @@ def projects():
         conn.commit()
         return jsonify({'p_id': new_p_id, 'name': data['name'], 'w_id': data['w_id']}), 201
 
-    rows = conn.execute("SELECT * FROM projects" + (" WHERE w_id = ?" if w_id else ""), 
-                       (w_id,) if w_id else ()).fetchall()
+    query = "SELECT * FROM projects"
+    params = ()
+    if w_id:
+        query += " WHERE w_id = ?"
+        params = (w_id,)
+        
+    rows = conn.execute(query, params).fetchall()
     return jsonify([dict(r) for r in rows])
 
 @app.route('/api/projects/<int:p_id>', methods=['PUT', 'DELETE'])
@@ -77,18 +82,18 @@ def handle_project(p_id):
         conn.commit()
         return jsonify({'message': 'Project Updated'}), 200
 
-# TASK ENDPOINTS
+# --- TASK ENDPOINTS ---
 @app.route('/api/tasks', methods=['GET', 'POST'])
 def tasks():
     conn = get_db_connection()
     if request.method == 'POST':
         data = request.json
-        # Default duration logic for new tasks
-        duration = 0
-        if data.get('start_time') and data.get('end_time'):
+        # Check if duration is provided or needs calculation
+        duration = data.get('duration_minutes', 0)
+        if not duration and data.get('start_time') and data.get('end_time'):
             fmt = '%H:%M'
             tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
-            duration = int(tdelta.total_seconds() / 60)
+            duration = max(0, int(tdelta.total_seconds() / 60))
 
         conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
@@ -116,21 +121,27 @@ def handle_task(task_id):
 
     if request.method == 'PUT':
         data = request.json
+        duration = data.get('duration_minutes', 0)
         
-        # If the frontend sends duration_minutes directly (from our new modal), use it.
-        # Otherwise, try to calculate it from times if they exist.
-        duration = data.get('duration_minutes')
-        if duration is None and data.get('start_time') and data.get('end_time'):
-            fmt = '%H:%M'
-            tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
-            duration = int(tdelta.total_seconds() / 60)
+        # If duration is 0 but we have times, calculate it
+        if duration == 0 and data.get('start_time') and data.get('end_time'):
+            try:
+                fmt = '%H:%M'
+                tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
+                duration = max(0, int(tdelta.total_seconds() / 60))
+            except:
+                duration = 0
 
-        conn.execute("""UPDATE tasks SET title=?, log_date=?, duration_minutes=?, status=? WHERE id=?""",
-                     (data['title'], data['log_date'], duration, data['status'], task_id))
+        # UPDATE: Now includes start_time and end_time
+        conn.execute("""UPDATE tasks 
+                        SET title=?, log_date=?, duration_minutes=?, status=?, start_time=?, end_time=? 
+                        WHERE id=?""",
+                     (data['title'], data['log_date'], duration, data['status'], 
+                      data.get('start_time'), data.get('end_time'), task_id))
         conn.commit()
         return jsonify({'message': 'Updated'}), 200
 
-# SUMMARY ENDPOINT
+# --- SUMMARY ENDPOINT ---
 @app.route('/api/summary/<date>', methods=['GET'])
 def get_summary(date):
     conn = get_db_connection()
