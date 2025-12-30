@@ -1,42 +1,137 @@
-#root {
-  max-width: 1280px;
+:root {
+  --bg-dark: #0f172a;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --primary-blue: #3b82f6;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --max-width: 1200px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+/* --- 2. MAIN APP LAYOUT --- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  width: 100%;
+  max-width: var(--max-width);
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.app-header {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.blue-text { 
+  color: var(--primary-blue);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  background: var(--border-color);
+  color: white;
+}
+
+.nav-item.active {
+  background: var(--primary-blue);
+  color: white;
 }
 
 .card {
-  padding: 2em;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  width: 100%; 
 }
 
-.read-the-docs {
-  color: #888;
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-main);
+}
+
+.dashboard-top-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* On Desktop: Form and Summary sit side-by-side */
+@media (min-width: 1024px) {
+  .dashboard-top-row {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; 
+    gap: 2rem;
+    align-items: start;
+  }
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
 }

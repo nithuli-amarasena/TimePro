@@ -1,0 +1,115 @@
+.daily-summary-card {
+  background: var(--card-bg, #1e293b); 
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-picker-container {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.summary-date-input {
+  background: transparent;
+  border: none;
+  color: var(--text-main, #f8fafc);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.summary-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+.charts-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 2rem;
+  flex: 1;
+}
+
+.chart-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.chart-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 240px;
+  position: relative;
+}
+
+.center-label {
+  font-size: 1.1rem;
+  font-weight: 800;
+  fill: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.icon-blue { color: #3b82f6; }
+.icon-green { color: #10b981; }
+
+.empty-summary {
+  padding: 3rem;
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .charts-row {
+    flex-direction: column;
+    gap: 3rem;
+  }
+  
+  .chart-wrapper {
+    height: 200px;
+  }
+}
