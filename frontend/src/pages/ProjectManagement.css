@@ -241,3 +241,91 @@
 .confirm-btn { background: var(--primary-blue); border: none; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
 
 .placeholder { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem; opacity: 0.5; }
+
+.view-toggle-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
+.tab-btn.active { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); }
+
+/* --- ADDED: REBUILT DASHBOARD GRID --- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto 350px;
+  gap: 20px;
+  flex: 1;
+}
+
+.d-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+/* Metric KPI Cards */
+.metric { display: flex; align-items: center; gap: 15px; position: relative; }
+.metric-icon { 
+  width: 44px; height: 44px; border-radius: 10px; 
+  display: flex; align-items: center; justify-content: center;
+}
+.metric-icon.blue { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); }
+.metric-icon.green { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.metric-icon.orange { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.metric-icon.purple { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+
+.metric .label { display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+.metric .value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+
+.mini-progress { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.05); overflow: hidden; border-radius: 0 0 16px 16px; }
+.mini-progress .fill { height: 100%; background: #10b981; }
+
+/* Dashboard Charts */
+.chart-main { grid-column: span 3; display: flex; flex-direction: column; }
+.chart-side { grid-column: span 1; overflow-y: auto; }
+.card-header h4 { margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+
+/* Weekly Bar Chart */
+.v-bar-chart {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex: 1; padding: 20px 10px 0; border-bottom: 1px solid var(--border-color);
+}
+.bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.bar-wrapper { width: 35%; height: 200px; display: flex; align-items: flex-end; position: relative; }
+.bar-fill { 
+  width: 100%; background: var(--primary-blue); border-radius: 4px 4px 0 0; 
+  transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer;
+}
+.bar-label { margin-top: 10px; font-size: 0.65rem; color: var(--text-muted); font-weight: 600; }
+
+/* Bar Tooltip */
+.bar-group .tooltip {
+  position: absolute; top: -30px; background: #000; color: #fff; padding: 4px 8px;
+  border-radius: 4px; font-size: 0.65rem; opacity: 0; transition: 0.2s; pointer-events: none;
+}
+.bar-group:hover .tooltip { opacity: 1; transform: translateY(-5px); }
+
+/* Horizontal List Distribution */
+.h-item { margin-bottom: 12px; }
+.h-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; color: var(--text-main); }
+.h-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+.h-bar .fill { height: 100%; background: var(--primary-blue); border-radius: 3px; }
