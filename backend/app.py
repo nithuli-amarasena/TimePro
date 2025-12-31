@@ -90,17 +90,25 @@ def tasks():
         data = request.json
         # Check if duration is provided or needs calculation
         duration = data.get('duration_minutes', 0)
+        
+        # Calculate duration if missing but times exist
         if not duration and data.get('start_time') and data.get('end_time'):
-            fmt = '%H:%M'
-            tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
-            duration = max(0, int(tdelta.total_seconds() / 60))
+            try:
+                fmt = '%H:%M'
+                tdelta = datetime.strptime(data['end_time'], fmt) - datetime.strptime(data['start_time'], fmt)
+                duration = max(0, int(tdelta.total_seconds() / 60))
+            except ValueError:
+                duration = 0
 
-        conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
+        # Execute Insert and capture the cursor to get the new ID
+        cur = conn.execute("""INSERT INTO tasks (title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                      (data['title'], data['log_date'], data.get('start_time'), data.get('end_time'), 
                       duration, data.get('p_id'), data.get('w_id'), data.get('status', 'Pending')))
         conn.commit()
-        return jsonify({'message': 'Task Logged'}), 201
+        
+        # Return the new ID so React can update its state immediately
+        return jsonify({'message': 'Task Logged', 'id': cur.lastrowid}), 201
 
     rows = conn.execute("""
         SELECT t.*, p.name as project_name, w.name as work_type_name 
