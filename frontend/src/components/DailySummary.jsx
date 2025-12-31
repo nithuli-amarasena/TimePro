@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Label } from 'recharts';
-import { CheckCircle, Clock } from 'lucide-react';
+import { CheckCircle, Clock, PieChart as PieIcon } from 'lucide-react';
 import './DailySummary.css';
 
 const COLORS_COMPLETED = ['#10b981', '#059669', '#34d399', '#064e3b']; 
@@ -11,7 +11,8 @@ const DailySummary = ({ refresh }) => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/summary/${selectedDate}`)
+    // Standardized to localhost to match the rest of the suite
+    fetch(`http://localhost:5000/api/summary/${selectedDate}`)
       .then(res => res.json())
       .then(d => setData(d))
       .catch(err => console.error("Fetch error:", err));
@@ -39,11 +40,9 @@ const DailySummary = ({ refresh }) => {
             const mins = Number(task.duration) || 0;
             const status = task.status?.toLowerCase().trim();
 
-            // Every task contributes to "Planned"
             wTypePlannedMins += mins;
             pSum += mins;
 
-            // Only "Completed" tasks contribute to "Completed"
             if (status === 'completed') {
               wTypeCompletedMins += mins;
               cSum += mins;
@@ -61,9 +60,17 @@ const DailySummary = ({ refresh }) => {
   return (
     <div className="card daily-summary-card">
       <div className="summary-header">
-        <h3 className="card-title">📊 Progress Overview</h3>
+        <h3 className="card-title">
+          <PieIcon size={20} className="icon-blue" /> 
+          Progress Overview
+        </h3>
         <div className="date-picker-container">
-          <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="summary-date-input" />
+          <input 
+            type="date" 
+            value={selectedDate} 
+            onChange={(e) => setSelectedDate(e.target.value)} 
+            className="summary-date-input" 
+          />
         </div>
       </div>
 
@@ -71,7 +78,7 @@ const DailySummary = ({ refresh }) => {
         <div className="empty-summary">No activity logged for this date.</div>
       ) : (
         <div className="charts-row">
-          {/* 1st: PLANNED */}
+          {/* PLANNED CHART */}
           <div className="chart-item">
             <div className="chart-label"><Clock size={14}/> PLANNED</div>
             <div className="chart-wrapper">
@@ -81,13 +88,17 @@ const DailySummary = ({ refresh }) => {
                     {stats.plannedArr.map((_, i) => <Cell key={i} fill={COLORS_PLANNED[i % COLORS_PLANNED.length]} />)}
                     <Label value={formatTime(stats.pSum)} position="center" fill="#fff" className="center-label" />
                   </Pie>
-                  <Tooltip formatter={(v) => formatTime(v)} />
+                  <Tooltip 
+                    contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f8fafc' }}
+                    itemStyle={{ color: '#f8fafc' }}
+                    formatter={(v) => formatTime(v)} 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* 2nd: COMPLETED */}
+          {/* COMPLETED CHART */}
           <div className="chart-item">
             <div className="chart-label"><CheckCircle size={14}/> COMPLETED</div>
             <div className="chart-wrapper">
@@ -97,7 +108,11 @@ const DailySummary = ({ refresh }) => {
                     {stats.completedArr.map((_, i) => <Cell key={i} fill={COLORS_COMPLETED[i % COLORS_COMPLETED.length]} />)}
                     <Label value={formatTime(stats.cSum)} position="center" fill="#fff" className="center-label" />
                   </Pie>
-                  <Tooltip formatter={(v) => formatTime(v)} />
+                  <Tooltip 
+                    contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f8fafc' }}
+                    itemStyle={{ color: '#f8fafc' }}
+                    formatter={(v) => formatTime(v)} 
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>

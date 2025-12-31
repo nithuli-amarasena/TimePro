@@ -1,19 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { Clock, List, Settings } from 'lucide-react';
-
-// We will create these files in Step 4
 import TimeLogger from './pages/TimeLogger';
 import AllLogs from './pages/AllLogs';
 import Management from './pages/ProjectManagement';
-
 import './App.css';
 
 function App() {
   return (
     <Router>
       <div className="app-container">
-        {/* --- PERSISTENT NAVIGATION BAR --- */}
+        {/* --- NAVIGATION BAR --- */}
         <header className="app-header">
           <div className="nav-content">
             <div className="logo">

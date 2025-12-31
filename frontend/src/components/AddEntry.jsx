@@ -1,42 +1,61 @@
 import React, { useState, useEffect } from 'react';
+import { Zap, Edit2, Calendar, Clock, ListTodo, Save, RotateCcw, Briefcase, Layers } from 'lucide-react';
 import './AddEntry.css';
 
 const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     title: '',
     log_date: new Date().toISOString().split('T')[0],
     start_time: '',
     end_time: '',
     w_id: '',
     p_id: '',
-    status: 'Pending' 
-  });
+    status: 'Pending'
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
   const [workTypes, setWorkTypes] = useState([]);
   const [projects, setProjects] = useState([]);
 
+  // Fetch Work Types on mount
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/work-types')
+    fetch('http://localhost:5000/api/work-types')
       .then(res => res.json())
-      .then(data => setWorkTypes(data));
+      .then(data => setWorkTypes(data))
+      .catch(err => console.error("Error fetching work types:", err));
   }, []);
 
+  // Handle Edit Mode - Mapping incoming task data to form state
   useEffect(() => {
     if (taskToEdit) {
-      setFormData(taskToEdit);
+      setFormData({
+        title: taskToEdit.title || '',
+        log_date: taskToEdit.log_date ? taskToEdit.log_date.split('T')[0] : new Date().toISOString().split('T')[0],
+        start_time: taskToEdit.start_time || '',
+        end_time: taskToEdit.end_time || '',
+        w_id: taskToEdit.w_id || '',
+        p_id: taskToEdit.p_id || '',
+        status: taskToEdit.status || 'Pending'
+      });
+    } else {
+      setFormData(initialFormState);
     }
   }, [taskToEdit]);
 
+  // Fetch Projects based on Work Type
   useEffect(() => {
     if (formData.w_id) {
-      fetch(`http://127.0.0.1:5000/api/projects?w_id=${formData.w_id}`)
+      fetch(`http://localhost:5000/api/projects?w_id=${formData.w_id}`)
         .then(res => res.json())
         .then(data => {
           setProjects(data);
-          if (!taskToEdit) {
-            setFormData(prev => ({ ...prev, p_id: '' }));
+          // Only clear project ID if we are NOT in edit mode or if the work type actually changed
+          if (!taskToEdit || (taskToEdit && taskToEdit.w_id !== formData.w_id)) {
+            if (!taskToEdit) setFormData(prev => ({ ...prev, p_id: '' }));
           }
         });
+    } else {
+      setProjects([]);
     }
   }, [formData.w_id, taskToEdit]);
 
@@ -44,41 +63,40 @@ const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
     e.preventDefault();
     const method = taskToEdit ? 'PUT' : 'POST';
     const url = taskToEdit 
-      ? `http://127.0.0.1:5000/api/tasks/${taskToEdit.id}` 
-      : 'http://127.0.0.1:5000/api/tasks';
+      ? `http://localhost:5000/api/tasks/${taskToEdit.id}` 
+      : 'http://localhost:5000/api/tasks';
 
-    const response = await fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-
-    if (response.ok) {
-      onTaskAdded(); 
-      setFormData({ 
-        title: '', 
-        log_date: new Date().toISOString().split('T')[0], 
-        start_time: '', 
-        end_time: '', 
-        w_id: '', 
-        p_id: '', 
-        status: 'Pending' 
+    try {
+      const res = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
-    } else {
-      alert("Failed to save. Check terminal for errors.");
+
+      if (res.ok) {
+        // 1. Refresh the logs list (using the correct prop name)
+        onTaskAdded(); 
+        onCancel(); 
+        
+        // 3. Clear local form
+        setFormData(initialFormState);
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
     }
   };
 
   return (
     <div className="card">
       <h3 className="card-title">
-        {taskToEdit ? '✏️ Edit Activity' : '🚀 Log New Activity'}
+        {taskToEdit ? <Edit2 size={20} className="header-icon" /> : <Zap size={20} className="header-icon" />}
+        {taskToEdit ? 'Edit Activity' : 'Log New Activity'}
       </h3>
 
       <form onSubmit={handleSubmit} className="entry-form">
         <div className="form-row">
           <div className="input-group">
-            <label>Work Type</label>
+            <label><Layers size={12} /> Work Type</label>
             <select 
               value={formData.w_id} 
               onChange={(e) => setFormData({...formData, w_id: e.target.value})} 
@@ -89,7 +107,7 @@ const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
             </select>
           </div>
           <div className="input-group">
-            <label>Project</label>
+            <label><Briefcase size={12} /> Project</label>
             <select 
               value={formData.p_id} 
               onChange={(e) => setFormData({...formData, p_id: e.target.value})} 
@@ -103,19 +121,19 @@ const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
         </div>
 
         <div className="input-group">
-          <label>Task Description</label>
+          <label><ListTodo size={12} /> Task Description</label>
           <input 
             type="text" 
             value={formData.title} 
             onChange={(e) => setFormData({...formData, title: e.target.value})} 
             required 
-            placeholder="What are you working on?" 
+            placeholder="What did you accomplish?" 
           />
         </div>
 
         <div className="form-row status-row">
           <div className="input-group">
-            <label>Date</label>
+            <label><Calendar size={12} /> Date</label>
             <input 
               type="date" 
               value={formData.log_date} 
@@ -125,16 +143,17 @@ const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
           <div className="input-group">
             <label>Status</label>
             <select 
+              className={`status-select ${formData.status.toLowerCase().replace(/\s+/g, '-')}`}
               value={formData.status} 
               onChange={(e) => setFormData({...formData, status: e.target.value})}
             >
-              <option value="Pending">🕒 Pending</option>
-              <option value="In Progress">⚡ In Progress</option>
-              <option value="Completed">✅ Completed</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
             </select>
           </div>
           <div className="input-group">
-            <label>Start</label>
+            <label><Clock size={12} /> Start</label>
             <input 
               type="time" 
               value={formData.start_time} 
@@ -143,7 +162,7 @@ const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
             />
           </div>
           <div className="input-group">
-            <label>End</label>
+            <label><Clock size={12} /> End</label>
             <input 
               type="time" 
               value={formData.end_time} 
@@ -153,15 +172,17 @@ const AddEntry = ({ onTaskAdded, taskToEdit, onCancel }) => {
           </div>
         </div>
 
-        <button type="submit" className="save-btn">
-          {taskToEdit ? 'Save Changes' : 'Add to Log'}
-        </button>
-
-        {taskToEdit && (
-          <button type="button" onClick={onCancel} className="cancel-btn">
-            Cancel Edit
+        <div className="action-row">
+          <button type="submit" className="save-btn">
+            <Save size={18} /> {taskToEdit ? 'Save Changes' : 'Add to Log'}
           </button>
-        )}
+
+          {taskToEdit && (
+            <button type="button" onClick={onCancel} className="cancel-btn">
+              <RotateCcw size={18} /> Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Pencil, RefreshCw } from 'lucide-react'; 
+import { Trash2, Edit2, RefreshCw, Activity } from 'lucide-react';
 import './RecentLogs.css';
 
 const RecentLogs = ({ refresh, onEdit }) => {
@@ -9,7 +9,7 @@ const RecentLogs = ({ refresh, onEdit }) => {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/tasks');
+      const res = await fetch('http://localhost:5000/api/tasks');
       const data = await res.json();
       setLogs(data);
     } catch (err) {
@@ -25,7 +25,7 @@ const RecentLogs = ({ refresh, onEdit }) => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this log?")) {
-      const res = await fetch(`http://127.0.0.1:5000/api/tasks/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:5000/api/tasks/${id}`, { method: 'DELETE' });
       if (res.ok) fetchLogs();
     }
   };
@@ -33,9 +33,16 @@ const RecentLogs = ({ refresh, onEdit }) => {
   return (
     <div className="recent-logs-container card">
       <div className="logs-header">
-        <h3>Recent Activity</h3>
-        <button onClick={fetchLogs} className="refresh-icon-btn" title="Refresh">
-          <RefreshCw size={18} className={loading ? 'spinning' : ''} />
+        <h3 className="card-title">
+          <Activity size={20} className="header-icon" />
+          Recent Activity
+        </h3>
+        <button 
+          onClick={fetchLogs} 
+          className={`refresh-icon-btn ${loading ? 'spinning' : ''}`} 
+          title="Refresh Logs"
+        >
+          <RefreshCw size={18} />
         </button>
       </div>
 
@@ -43,8 +50,7 @@ const RecentLogs = ({ refresh, onEdit }) => {
         <table className="logs-table">
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Task Details</th>
+              <th>Task / Type</th>
               <th>Project</th>
               <th>Duration</th>
               <th>Status</th>
@@ -55,42 +61,43 @@ const RecentLogs = ({ refresh, onEdit }) => {
             {logs.length > 0 ? (
               logs.map((log) => (
                 <tr key={log.id}>
-                  <td>{log.log_date}</td>
                   <td>
                     <div className="task-title">{log.title}</div>
                     <small className="work-type-tag">{log.work_type_name}</small>
                   </td>
                   <td>{log.project_name}</td>
-                  <td>{Math.floor(log.duration_minutes / 60)}h {log.duration_minutes % 60}m</td>
+                  <td className="time-cell">
+                    {Math.floor(log.duration_minutes / 60)}h {log.duration_minutes % 60}m
+                  </td>
                   <td>
                     <span className={`status-pill ${log.status.replace(/\s+/g, '-').toLowerCase()}`}>
                       {log.status}
                     </span>
                   </td>
                   <td className="actions-cell">
-                    {/* EDIT BUTTON */}
-                    <button 
-                      onClick={() => onEdit(log)}
-                      className="action-btn edit-btn" 
-                      title="Edit Task"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    
-                    {/* DELETE BUTTON */}
-                    <button 
-                      onClick={() => handleDelete(log.id)} 
-                      className="action-btn delete-btn" 
-                      title="Delete Task"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="actions-wrapper">
+                      {/* FIX: Added onClick to trigger onEdit prop */}
+                      <button 
+                        onClick={() => onEdit(log)} 
+                        className="action-btn edit-btn" 
+                        title="Edit"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(log.id)} 
+                        className="action-btn delete-btn"
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="empty-state">No logs found.</td>
+                <td colSpan="5" className="empty-state">No logs found. Start by adding a task above!</td>
               </tr>
             )}
           </tbody>
