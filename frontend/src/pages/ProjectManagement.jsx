@@ -11,7 +11,6 @@ const ProjectManagement = () => {
   const [projects, setProjects] = useState([]);
   const [allTasks, setAllTasks] = useState([]);
   
-  // --- ADDED FOR DASHBOARD ---
   const [activeTab, setActiveTab] = useState('explorer');
 
   const [selectedWId, setSelectedWId] = useState(null);
@@ -48,13 +47,11 @@ const ProjectManagement = () => {
     }
   };
 
-  // --- NEW DASHBOARD CALCULATION LOGIC ---
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
     const todayTasks = allTasks.filter(t => t.log_date === today);
     const completed = allTasks.filter(t => t.status === 'Completed');
     
-    // Weekly Trend (Last 7 days)
     const weekly = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -69,7 +66,6 @@ const ProjectManagement = () => {
       });
     }
 
-    // Project Time Distribution
     const projDist = projects.map(p => {
       const mins = allTasks
         .filter(t => t.p_id === p.p_id)
@@ -90,12 +86,13 @@ const ProjectManagement = () => {
 
   const formatDuration = (totalMinutes) => {
     if (!totalMinutes || totalMinutes === 0) return "0m";
-  const hours = Math.floor(totalMinutes / 60);
-  const mins = totalMinutes % 60;
-  if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
-  if (hours > 0) return `${hours}h`;
-  return `${mins}m`;
-};
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+    if (hours > 0) return `${hours}h`;
+    return `${mins}m`;
+  };
+
   const calculateDuration = (start, end) => {
     if (!start || !end) return 0;
     const [sH, sM] = start.split(':').map(Number);
@@ -108,15 +105,34 @@ const ProjectManagement = () => {
 
   const handleAddWorkType = async () => {
     if (!newWTName.trim()) return;
-    const res = await fetch('http://localhost:5000/api/work-types', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newWTName }),
-    });
-    if (res.ok) { setNewWTName(''); setShowAddWT(false); fetchData(); }
+
+    try {
+      const res = await fetch('http://localhost:5000/api/work-types', {
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newWTName }),
+      });
+
+      if (res.ok) { 
+        setNewWTName(''); 
+        setShowAddWT(false); 
+        fetchData(); 
+      } else {
+        // This will catch things like 400 or 500 errors from the server
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Server Error:", errorData);
+        alert("Server error: " + (errorData.message || "Could not save. Check console."));
+      }
+    } catch (err) {
+      // This will catch network errors (e.g., server is down)
+      console.error("Network error:", err);
+      alert("Network error: Is your backend running on port 5000?");
+    }
   };
 
   const handleAddProject = async () => {
-    if (!newPName.trim() || !selectedWId) return;
+    // FIX: Check selectedWId against null explicitly
+    if (!newPName.trim() || selectedWId === null) return;
     const res = await fetch('http://localhost:5000/api/projects', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newPName, w_id: selectedWId }),
@@ -125,7 +141,8 @@ const ProjectManagement = () => {
   };
 
   const handleAddTask = async () => {
-    if (!newTaskTitle.trim() || !selectedPId) return;
+    // FIX: Check selectedPId against null explicitly
+    if (!newTaskTitle.trim() || selectedPId === null) return;
     const res = await fetch('http://localhost:5000/api/tasks', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -178,7 +195,6 @@ const ProjectManagement = () => {
 
   return (
     <div className="pm-explorer-wrapper">
-      {/* NEW TAB HEADER */}
       <div className="view-toggle-header">
         <button className={`tab-btn ${activeTab === 'explorer' ? 'active' : ''}`} onClick={() => setActiveTab('explorer')}>
           <LayoutGrid size={16} /> Explorer
@@ -219,10 +235,11 @@ const ProjectManagement = () => {
             </div>
           </div>
 
-          <div className={`explorer-column ${!selectedWId ? 'disabled' : ''}`}>
+          {/* FIX: Column 2 Disabled check */}
+          <div className={`explorer-column ${selectedWId === null ? 'disabled' : ''}`}>
             <div className="column-header">
               <div className="header-left"><Briefcase size={18} /> <h3>Projects</h3></div>
-              {selectedWId && (
+              {selectedWId !== null && (
                 <button className="btn-add-circle" onClick={() => setShowAddP(!showAddP)}>
                   {showAddP ? <X size={20} color="#3b82f6" /> : <Plus size={20} color="#3b82f6" />}
                 </button>
@@ -237,7 +254,7 @@ const ProjectManagement = () => {
                   </div>
                 </div>
               )}
-              {selectedWId ? projects.filter(p => p.w_id === selectedWId).map(p => (
+              {selectedWId !== null ? projects.filter(p => p.w_id === selectedWId).map(p => (
                 <div key={p.p_id} className={`nav-card ${selectedPId === p.p_id ? 'active' : ''}`} onClick={() => setSelectedPId(p.p_id)}>
                   <div className="card-left-info"><span className="name">{p.name}</span><span className="count">{allTasks.filter(t => t.p_id === p.p_id).length}</span></div>
                   <div className="card-right-actions">
@@ -250,10 +267,11 @@ const ProjectManagement = () => {
             </div>
           </div>
 
-          <div className={`explorer-column wide-column ${!selectedPId ? 'disabled' : ''}`}>
+          {/* FIX: Column 3 Disabled check */}
+          <div className={`explorer-column wide-column ${selectedPId === null ? 'disabled' : ''}`}>
             <div className="column-header">
               <div className="header-left"><ListTodo size={18} /> <h3>Task History</h3></div>
-              {selectedPId && (
+              {selectedPId !== null && (
                 <button className="btn-add-circle" onClick={() => setShowAddT(!showAddT)}>
                   {showAddT ? <X size={20} color="#3b82f6" /> : <Plus size={20} color="#3b82f6" />}
                 </button>
@@ -268,7 +286,7 @@ const ProjectManagement = () => {
                   </div>
                 </div>
               )}
-              {selectedPId ? allTasks.filter(t => t.p_id === selectedPId).map(t => (
+              {selectedPId !== null ? allTasks.filter(t => t.p_id === selectedPId).map(t => (
                 <div key={t.id} className="task-row-card">
                   <div className="task-card-left">
                     <span className="task-title-text">{t.title}</span>
@@ -339,7 +357,7 @@ const ProjectManagement = () => {
               {stats.projDist.map((p, i) => (
                 <div key={i} className="h-item">
                   <div className="h-label"><span>{p.name}</span> <span>{formatDuration(p.minutes)}</span></div>
-                  <div className="h-bar"><div className="fill" style={{width: `${(p.minutes / stats.projDist[0].minutes) * 100}%`}}></div></div>
+                  <div className="h-bar"><div className="fill" style={{width: `${(p.minutes / (stats.projDist[0]?.minutes || 1)) * 100}%`}}></div></div>
                 </div>
               ))}
             </div>
@@ -347,7 +365,6 @@ const ProjectManagement = () => {
         </div>
       )}
 
-      {/* UNIVERSAL EDIT MODAL */}
       {isEditModalOpen && editingItem && (
         <div className="modal-overlay" onClick={() => setIsEditModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

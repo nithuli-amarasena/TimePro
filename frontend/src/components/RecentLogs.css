@@ -2,19 +2,25 @@
   margin-top: 1.5rem;
 }
 
+.logs-header .refresh-icon-btn{
+  background: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logs-header .refresh-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary-blue);
+}
+
 .logs-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-}
-
-.btn-text {
-  background: none;
-  border: none;
-  color: #3b82f6;
-  cursor: pointer;
-  font-size: 0.85rem;
+  margin-bottom: 1.2rem;
 }
 
 .logs-table {
@@ -23,96 +29,91 @@
   text-align: left;
 }
 
-.logs-table th {
-  color: #888;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  padding: 10px;
-  border-bottom: 1px solid #333;
+.logs-table tr {
+  position: relative; 
 }
 
+/*Single row*/
+.logs-table tr::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08); /* Your line color */
+}
+
+/* Header line - slightly brighter */
+.logs-table thead tr::after {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.logs-table th, 
 .logs-table td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #252525;
-  font-size: 0.9rem;
+  padding: 8px 10px;
+  border: none !important; 
+  vertical-align: middle;
 }
 
-.task-title { font-weight: 500; }
-.work-type-tag { 
-  color: #3b82f6; 
+.task-title { 
+  font-weight: 500; 
+  margin-bottom: 2px;
+}
+
+.work-type-tag {
+  color: #3b82f6;
   background: rgba(59, 130, 246, 0.1);
   padding: 1px 6px;
   border-radius: 4px;
   font-size: 0.7rem;
 }
 
-/* Status Pills */
 .status-pill {
-  padding: 4px 8px;
-  border-radius: 20px;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
+  display: inline-block;
 }
 
 .status-pill.pending { background: rgba(255, 171, 0, 0.1); color: #ffab00; }
 .status-pill.in-progress { background: rgba(0, 184, 217, 0.1); color: #00b8d9; }
 .status-pill.completed { background: rgba(54, 179, 126, 0.1); color: #36b37e; }
 
-.delete-btn {
-  background: none;
-  border: none;
-  color: #ff5630;
-  cursor: pointer;
-  opacity: 0.6;
+.actions-cell {
+  width: 100px;
+  text-align: center;
 }
 
-.delete-btn:hover { opacity: 1; }
-
-.actions-cell {
+.actions-wrapper {
   display: flex;
-  gap: 12px;
   justify-content: center;
   align-items: center;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .action-btn {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   padding: 6px;
-  border-radius: 4px;
-  transition: 0.2s;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
 }
 
-/* Edit Button Styling (Blue) */
-.edit-btn {
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
-}
-.edit-btn:hover {
-  background: #3b82f6;
-  color: white;
-}
+.edit-btn { color: #3b82f6; }
+.edit-btn:hover { background: #3b82f6; color: white; }
 
-/* Delete Button Styling (Red) */
-.delete-btn {
-  color: #ff5630;
-  background: rgba(255, 86, 48, 0.1);
-}
-.delete-btn:hover {
-  background: #ff5630;
-  color: white;
-}
+.delete-btn { color: #ff5630; }
+.delete-btn:hover { background: #ff5630; color: white; }
 
-.text-center { text-align: center; }
-
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
+/* Utilities */
+.spinning { animation: spin 1s linear infinite; }
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

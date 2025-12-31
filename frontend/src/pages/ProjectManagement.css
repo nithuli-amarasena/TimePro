@@ -66,7 +66,7 @@
 
 /* NAV CARDS (Columns 1 & 2) */
 .nav-card {
-  padding: 8px 12px; /* Minimized row size */
+  padding: 8px 12px;
   border-radius: 8px;
   margin-bottom: 4px;
   display: flex;
@@ -82,7 +82,6 @@
   background: rgba(255, 255, 255, 0.04); 
 }
 
-/* Active State: When a card is selected (Blue background) */
 .nav-card.active { 
   background: var(--primary-blue); 
   color: white; 
@@ -116,7 +115,6 @@
   gap: 4px; 
 }
 
-/*coloumn 1,2,3 action icons*/
 .action-icon, .mini-icon-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -134,7 +132,6 @@
   color: white;
 }
 
-/* 2. Delete Button (Default) */
 .action-icon.del, .mini-icon-btn.del {
   background: rgba(239, 68, 68, 0.1);
   color: var(--danger-red);
@@ -145,7 +142,6 @@
   color: white;
 }
 
-/* 3. Handle Buttons when the Card is Active (Blue) */
 .nav-card.active .action-icon, .nav-card.active .mini-icon-btn {
   background: rgba(255, 255, 255, 0.15);
   color: white;
@@ -161,7 +157,6 @@
   color: var(--danger-red);
 }
 
-/* The Chevron hint color */
 .nav-card svg:last-child {
   opacity: 0.4;
   margin-left: 2px;
@@ -215,7 +210,6 @@
 
 .task-card-actions { display: flex; gap: 8px; }
 
-/* MODALS */
 .modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.8);
@@ -234,11 +228,19 @@
 .modal-body input, .modal-body select { background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px; color: var(--text-main); outline: none; width: 100%; }
 .modal-footer { padding: 14px 20px; background: rgba(0,0,0,0.1); display: flex; justify-content: flex-end; gap: 10px; }
 
-/* INLINE ADD FORM */
 .inline-add-container { margin-bottom: 12px; }
 .input-wrapper { display: flex; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 8px; padding: 3px; }
 .input-wrapper input { flex: 1; background: transparent; border: none; color: white; padding: 6px 10px; font-size: 0.8rem; outline: none; }
-.confirm-btn { background: var(--primary-blue); border: none; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
+.confirm-btn {
+  background: var(--primary-blue);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  flex-shrink: 0; /* Add this */
+  display: flex;
+  align-items: center;
+}
 
 .placeholder { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.85rem; opacity: 0.5; }
 
@@ -266,7 +268,6 @@
 .tab-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
 .tab-btn.active { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); }
 
-/* --- ADDED: REBUILT DASHBOARD GRID --- */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -282,7 +283,6 @@
   padding: 20px;
 }
 
-/* Metric KPI Cards */
 .metric { display: flex; align-items: center; gap: 15px; position: relative; }
 .metric-icon { 
   width: 44px; height: 44px; border-radius: 10px; 
@@ -299,12 +299,10 @@
 .mini-progress { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(255,255,255,0.05); overflow: hidden; border-radius: 0 0 16px 16px; }
 .mini-progress .fill { height: 100%; background: #10b981; }
 
-/* Dashboard Charts */
 .chart-main { grid-column: span 3; display: flex; flex-direction: column; }
 .chart-side { grid-column: span 1; overflow-y: auto; }
 .card-header h4 { margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
 
-/* Weekly Bar Chart */
 .v-bar-chart {
   display: flex; align-items: flex-end; justify-content: space-between;
   flex: 1; padding: 20px 10px 0; border-bottom: 1px solid var(--border-color);
@@ -317,14 +315,12 @@
 }
 .bar-label { margin-top: 10px; font-size: 0.65rem; color: var(--text-muted); font-weight: 600; }
 
-/* Bar Tooltip */
 .bar-group .tooltip {
   position: absolute; top: -30px; background: #000; color: #fff; padding: 4px 8px;
   border-radius: 4px; font-size: 0.65rem; opacity: 0; transition: 0.2s; pointer-events: none;
 }
 .bar-group:hover .tooltip { opacity: 1; transform: translateY(-5px); }
 
-/* Horizontal List Distribution */
 .h-item { margin-bottom: 12px; }
 .h-label { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; color: var(--text-main); }
 .h-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }

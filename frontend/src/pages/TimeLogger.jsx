@@ -18,7 +18,7 @@ const TimeLogger = () => {
       <div className="dashboard-top-row">
         <AddEntry 
           onTaskAdded={handleRefresh} 
-          taskToEdit={editingTask} 
+          taskToEdit={editingTask}
           onCancel={() => setEditingTask(null)} 
         />
         <DailySummary refresh={refreshTrigger} />
