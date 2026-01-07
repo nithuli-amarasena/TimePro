@@ -1,4 +1,4 @@
-TaskTime Logger
+Time Logger
 
 Time-Pro is a streamlined, full-stack application designed to help you track work hours, organize tasks by project, and visualize your daily productivity. Whether you are a freelancer or just looking to optimize your workflow, TaskTime provides a clean interface to log your sessions and stay organized.
 
