@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, Calendar as CalendarIcon, Clock, Edit2, 
-  Trash2, X, Filter, RotateCcw, ChevronDown 
-} from 'lucide-react';
+import { Search, Calendar as CalendarIcon, Clock, Edit2, Trash2, X, Filter, RotateCcw } from 'lucide-react';
 import './AllLogs.css';
+import { useAuth } from '../context/AuthContext';
 
 const AllLogs = () => {
-  // 1. STATE INITIALIZATION
+  const { checkAuthStatus } = useAuth();
   const [logs, setLogs] = useState([]);
   const [projects, setProjects] = useState([]);
   const [workTypes, setWorkTypes] = useState([]);
@@ -15,25 +13,27 @@ const AllLogs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  // Filters state...
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProject, setFilterProject] = useState('');
   const [filterWorkType, setFilterWorkType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
-  // 2. DATA FETCHING
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      // Changed logsRes URL to /api/tasks to match your app.py
+      const options = { credentials: 'include' };
       const [logsRes, projRes, workRes] = await Promise.all([
-        fetch('http://localhost:5000/api/tasks'), 
-        fetch('http://localhost:5000/api/projects'),
-        fetch('http://localhost:5000/api/work-types')
+        fetch('http://localhost:5000/api/tasks', options), 
+        fetch('http://localhost:5000/api/projects', options),
+        fetch('http://localhost:5000/api/work-types', options)
       ]);
+
+      if (logsRes.status === 401) return await checkAuthStatus();
 
       const logsData = await logsRes.json();
       const projData = await projRes.json();
@@ -42,54 +42,53 @@ const AllLogs = () => {
       setLogs(logsData);
       setProjects(projData);
       setWorkTypes(workData);
-      setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Fetch failed:", error);
+    } finally {
       setLoading(false);
-    }
-  };
-
-  // 3. ACTION HANDLERS
-  const openEditModal = (log) => {
-    setEditingTask({ ...log });
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this log?')) {
-      try {
-        await fetch(`http://localhost:5000/api/tasks/${id}`, { method: 'DELETE' });
-        setLogs(logs.filter(log => log.id !== id));
-      } catch (error) {
-        console.error("Delete failed:", error);
-      }
     }
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:5000/api/tasks/${editingTask.id}`, {
+      const res = await fetch(`http://localhost:5000/api/tasks/${editingTask.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingTask)
+        credentials: 'include',
+        body: JSON.stringify(editingTask),
       });
 
-      if (response.ok) {
+      if (res.ok) {
         setIsModalOpen(false);
-        fetchData(); 
+        fetchData();
+      } else if (res.status === 401) {
+        await checkAuthStatus();
       }
-    } catch (error) {
-      console.error("Update failed:", error);
+    } catch (err) {
+      console.error("Update failed:", err);
     }
   };
 
-  // 4. FILTERING & CALCULATIONS (Using p_id and w_id)
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this log permanently?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/tasks/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (res.ok) fetchData();
+      else if (res.status === 401) await checkAuthStatus();
+    } catch (err) {
+      console.error("Delete failed:", err);
+    }
+  };
+
+  // 4. FILTERING & CALCULATIONS
   const processedLogs = logs.filter(log => {
     const matchesSearch = log.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          log.project_name.toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Updated to use p_id and w_id from the database/backend
     const logPid = log.p_id ? log.p_id.toString() : "";
     const logWid = log.w_id ? log.w_id.toString() : "";
 

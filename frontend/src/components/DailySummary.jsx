@@ -11,9 +11,14 @@ const DailySummary = ({ refresh }) => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    // Standardized to localhost to match the rest of the suite
-    fetch(`http://localhost:5000/api/summary/${selectedDate}`)
-      .then(res => res.json())
+    // ADDED: credentials: 'include' as the second argument to fetch
+    fetch(`http://localhost:5000/api/summary/${selectedDate}`, {
+      credentials: 'include'
+    })
+      .then(res => {
+        if (res.status === 401) throw new Error("Unauthorized");
+        return res.json();
+      })
       .then(d => setData(d))
       .catch(err => console.error("Fetch error:", err));
   }, [refresh, selectedDate]);
@@ -78,7 +83,6 @@ const DailySummary = ({ refresh }) => {
         <div className="empty-summary">No activity logged for this date.</div>
       ) : (
         <div className="charts-row">
-          {/* PLANNED CHART */}
           <div className="chart-item">
             <div className="chart-label"><Clock size={14}/> PLANNED</div>
             <div className="chart-wrapper">
@@ -98,7 +102,6 @@ const DailySummary = ({ refresh }) => {
             </div>
           </div>
 
-          {/* COMPLETED CHART */}
           <div className="chart-item">
             <div className="chart-label"><CheckCircle size={14}/> COMPLETED</div>
             <div className="chart-wrapper">

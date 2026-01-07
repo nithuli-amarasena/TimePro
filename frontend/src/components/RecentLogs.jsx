@@ -9,7 +9,16 @@ const RecentLogs = ({ refresh, onEdit }) => {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/tasks');
+      // ADDED: credentials: 'include'
+      const res = await fetch('http://localhost:5000/api/tasks', {
+        credentials: 'include'
+      });
+      
+      if (res.status === 401) {
+        console.warn("Unauthorized: Session might have expired.");
+        return;
+      }
+
       const data = await res.json();
       setLogs(data);
     } catch (err) {
@@ -25,7 +34,11 @@ const RecentLogs = ({ refresh, onEdit }) => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this log?")) {
-      const res = await fetch(`http://localhost:5000/api/tasks/${id}`, { method: 'DELETE' });
+      // ADDED: credentials: 'include'
+      const res = await fetch(`http://localhost:5000/api/tasks/${id}`, { 
+        method: 'DELETE',
+        credentials: 'include' 
+      });
       if (res.ok) fetchLogs();
     }
   };
@@ -76,7 +89,6 @@ const RecentLogs = ({ refresh, onEdit }) => {
                   </td>
                   <td className="actions-cell">
                     <div className="actions-wrapper">
-                      {/* FIX: Added onClick to trigger onEdit prop */}
                       <button 
                         onClick={() => onEdit(log)} 
                         className="action-btn edit-btn" 
