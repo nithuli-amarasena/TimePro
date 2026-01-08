@@ -207,6 +207,24 @@ def tasks():
 
     if request.method == 'POST':
         data = request.json
+        
+        # 1. Handle missing log_date (default to today)
+        log_date = data.get('log_date', datetime.now().strftime('%Y-%m-%d'))
+        
+        # 2. Extract IDs
+        p_id = data.get('p_id')
+        w_id = data.get('w_id')
+
+        # 3. If w_id is missing, find it from the project table
+        if p_id and not w_id:
+            project = conn.execute("SELECT w_id FROM projects WHERE p_id = ?", (p_id,)).fetchone()
+            if project:
+                w_id = project['w_id']
+
+        # 4. Final validation before database entry
+        if not p_id or not w_id:
+            return jsonify({"message": "Project ID and Work Type ID are required"}), 400
+
         start = data.get('start_time')
         end = data.get('end_time')
         duration = 0
@@ -218,14 +236,21 @@ def tasks():
                 duration = max(0, int(tdelta.total_seconds() / 60))
             except: pass
 
-        cur = conn.execute("""
-            INSERT INTO tasks (user_id, title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (user_id, data['title'], data['log_date'], start, end, 
-             duration, data['p_id'], data['w_id'], data.get('status', 'Pending')))
-        conn.commit()
-        return jsonify({'message': 'Task Logged', 'id': cur.lastrowid}), 201
+        try:
+            cur = conn.execute("""
+                INSERT INTO tasks (user_id, title, log_date, start_time, end_time, duration_minutes, p_id, w_id, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (user_id, data.get('title', 'Untitled Task'), log_date, start, end, 
+                 duration, p_id, w_id, data.get('status', 'Pending')))
+            conn.commit()
+            return jsonify({'message': 'Task Logged', 'id': cur.lastrowid}), 201
+        except Exception as e:
+            print(f"Error inserting task: {e}")
+            return jsonify({"message": "Database error", "details": str(e)}), 500
+        finally:
+            conn.close()
 
+    # GET logic remains the same...
     rows = conn.execute("""
         SELECT t.*, p.name as project_name, w.name as work_type_name 
         FROM tasks t
@@ -234,6 +259,7 @@ def tasks():
         WHERE t.user_id = ?
         ORDER BY t.log_date DESC, t.id DESC
     """, (user_id,)).fetchall()
+    conn.close()
     return jsonify([dict(r) for r in rows])
 
 @app.route('/api/tasks/<int:task_id>', methods=['PUT', 'DELETE'])

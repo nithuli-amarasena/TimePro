@@ -51,16 +51,16 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             title TEXT NOT NULL,
-            p_id INTEGER NOT NULL,
-            w_id INTEGER NOT NULL,
             log_date TEXT NOT NULL,
-            duration_minutes INTEGER DEFAULT 0,
-            status TEXT DEFAULT 'Pending',
             start_time TEXT,
             end_time TEXT,
-            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-            FOREIGN KEY (p_id) REFERENCES projects (p_id) ON DELETE CASCADE,
-            FOREIGN KEY (w_id) REFERENCES work_types (w_id) ON DELETE CASCADE
+            duration_minutes INTEGER DEFAULT 0,
+            p_id INTEGER NOT NULL,
+            w_id INTEGER NOT NULL,
+            status TEXT DEFAULT 'Pending',
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (p_id) REFERENCES projects (p_id),
+            FOREIGN KEY (w_id) REFERENCES work_types (w_id)
         )
     ''')
     
