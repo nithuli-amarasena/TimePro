@@ -93,6 +93,11 @@ body {
   color: white;
 }
 
+.nav-item.logout-btn {
+  background: #fb8a8a;
+  color: white;
+}
+
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);

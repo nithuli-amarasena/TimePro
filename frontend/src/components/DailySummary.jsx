@@ -88,9 +88,9 @@ const DailySummary = ({ refresh }) => {
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={stats.plannedArr} innerRadius={55} outerRadius={75} dataKey="value" stroke="none">
+                  <Pie data={stats.plannedArr} innerRadius="70%" outerRadius="90%" paddingAngle={5} dataKey="value" stroke="none"cx="50%" cy="50%">
                     {stats.plannedArr.map((_, i) => <Cell key={i} fill={COLORS_PLANNED[i % COLORS_PLANNED.length]} />)}
-                    <Label value={formatTime(stats.pSum)} position="center" fill="#fff" className="center-label" />
+                    <Label value={formatTime(stats.pSum)} position="center" fill="var(--text-main)"className="center-label" />
                   </Pie>
                   <Tooltip 
                     contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f8fafc' }}
@@ -107,9 +107,9 @@ const DailySummary = ({ refresh }) => {
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={stats.completedArr} innerRadius={55} outerRadius={75} dataKey="value" stroke="none">
+                  <Pie data={stats.plannedArr} innerRadius="70%" outerRadius="90%" paddingAngle={5} dataKey="value" stroke="none"cx="50%" cy="50%">
                     {stats.completedArr.map((_, i) => <Cell key={i} fill={COLORS_COMPLETED[i % COLORS_COMPLETED.length]} />)}
-                    <Label value={formatTime(stats.cSum)} position="center" fill="#fff" className="center-label" />
+                    <Label value={formatTime(stats.cSum)} position="center" fill="var(--text-main)"className="center-label" />
                   </Pie>
                   <Tooltip 
                     contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f8fafc' }}

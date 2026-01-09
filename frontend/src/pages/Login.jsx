@@ -69,6 +69,7 @@ const Login = () => {
                 type="button" 
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
+                style={{ padding: 10, scrollSnapPointsX: 'none', margin: 0, border: 'none', background: 'none' }}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
